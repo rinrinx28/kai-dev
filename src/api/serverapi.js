@@ -98,3 +98,14 @@ export function getSold(slug) {
     body: JSON.stringify(post),
   }).then((res) => res.json());
 }
+
+export function getItems(contract, tokenid) {
+  return fetch(
+    `https://eth-mainnet.g.alchemy.com/nft/v2/VMWh2j_ip3vmb6j_axc76huyJImgU0fI/getNFTMetadata?contractAddress=${contract}&tokenId=${tokenid}&refreshCache=false`,
+    {
+      headers: {
+        accept: "application/json",
+      },
+    },
+  ).then((res) => res.json());
+}
