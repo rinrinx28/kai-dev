@@ -10,6 +10,7 @@ import {
   getCollectionnew,
   getListed,
   getSold,
+  updateCollection,
 } from "../api/serverapi";
 import { RiFileCopyLine } from "react-icons/ri";
 import ReactTooltip from "react-tooltip";
@@ -34,9 +35,31 @@ function Collection() {
   const collections = useQuery("get-collectionstt", () => {
     return getCollectionstt(name);
   });
-  const collection2 = useQuery("get-collectionnew", () => {
-    return getCollectionnew(name);
-  });
+  if (collections.isSuccess === true) {
+    if (collections.data[0].update_stt === 0) {
+      getCollectionnew(name).then((data) => {
+        var collection = data.collection;
+        var featured_image_url = collection.image_url;
+        var banner_image_url = collection.banner_image_url;
+        var external_url = collection.external_url;
+        var discord_url = collection.discord_url;
+        var twitter_username = collection.twitter_username;
+        var slug = collection.slug;
+        var collection_name = collection.name;
+        updateCollection(
+          name,
+          featured_image_url,
+          banner_image_url,
+          external_url,
+          discord_url,
+          twitter_username,
+          slug,
+          collection_name,
+        );
+        window.location.reload();
+      });
+    }
+  }
   const listing = useQuery(
     "get-listed",
     () => {
@@ -47,8 +70,7 @@ function Collection() {
   const sold = useQuery(
     "get-sold",
     () => {
-      // Type : DESC Gần Nhất // ASC Lâu nhất
-      return getSold(name, "DESC");
+      return getSold(name);
     },
     { refetchInterval: 5000 },
   );
@@ -65,13 +87,12 @@ function Collection() {
   return (
     <div className="collection">
       <Navbar />
-      {collection2.data?.collection !== undefined || null ? (
+      {collections.isSuccess === true ? (
         <div
           className="h-96 w-full bg-cover bg-center bg-white/50"
           style={{
             backgroundImage: `url("${
-              collection2.data.collection.banner_image_url.split("=")[0] +
-              "=1920&auto=format"
+              collections.data[0].banner.split("=")[0] + "=1920&auto=format"
             }")`,
           }}
         ></div>
@@ -81,8 +102,8 @@ function Collection() {
           {collections.data?.map((v, i) => (
             <div className="flex" key={i}>
               <img
-                alt={v.name_adr}
-                src={v.image_link}
+                alt={v.collection_name}
+                src={v.profile}
                 style={{
                   width: 80,
                   height: 80,
@@ -95,7 +116,7 @@ function Collection() {
               <div className="flex flex-col ml-4 w-[100%] gap-2 items-start">
                 <div className="flex items-center w-[100%] justify-start">
                   <h5 className="text-white text-2xl font-normal">
-                    {v.name_adr}
+                    {v.collection_name}
                   </h5>
                 </div>
                 <div
@@ -105,18 +126,18 @@ function Collection() {
                   data-for="copy"
                   onClick={() => {
                     setCopy("Copied");
-                    navigator.clipboard.writeText(`${v.contract_adr}`);
+                    navigator.clipboard.writeText(`${v.collection_adr}`);
                     setTimeout(() => {
                       setCopy("Copy");
                     }, 1e3 * 5);
                   }}
                 >
                   <p className="text-white/50">
-                    {v.contract_adr.slice(0, 8 - 1) +
+                    {v.collection_adr.slice(0, 8 - 1) +
                       "..." +
-                      v.contract_adr.slice(
-                        v.contract_adr.length - 8,
-                        v.contract_adr.length,
+                      v.collection_adr.slice(
+                        v.collection_adr.length - 8,
+                        v.collection_adr.length,
                       )}
                   </p>
                   <RiFileCopyLine
@@ -138,7 +159,11 @@ function Collection() {
                 />
                 <div className="flex gap-4 mt-1 items-center justify-center">
                   <div className="flex gap-4">
-                    <a href={v.slug_os} target="_blank" rel="noreferrer">
+                    <a
+                      href={`https://opensea.io/collection/${v.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       <svg
                         width="20"
                         height="20"
@@ -153,7 +178,7 @@ function Collection() {
                       </svg>
                     </a>
                     <a
-                      href={`https://etherscan.io/address/${v.contract_adr}`}
+                      href={`https://etherscan.io/address/${v.collection_adr}`}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -185,32 +210,22 @@ function Collection() {
                       </svg>
                     </a>
                     <hr className="ml-2 items-stretch h-auto border-solid border-white border-opacity-30 border" />
-                    {v.web_link !== "null" ? (
-                      <a
-                        href={`${v.web_link}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                    {v.website !== null ? (
+                      <a href={`${v.website}`} target="_blank" rel="noreferrer">
                         <BsGlobe color="rgb(255 255 255)" size={20} />
                       </a>
                     ) : null}
-                    {v.twitter_link.split("/")[
-                      v.twitter_link.split("/").length - 1
-                    ] !== "null" ? (
+                    {v.twitter !== null ? (
                       <a
-                        href={`${v.twitter_link}`}
+                        href={`https://twitter.com/${v.twitter}`}
                         target="_blank"
                         rel="noreferrer"
                       >
                         <BsTwitter color="rgb(255 255 255)" size={20} />
                       </a>
                     ) : null}
-                    {v.discord_link !== "null" ? (
-                      <a
-                        href={`${v.discord_link}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                    {v.discord !== null ? (
+                      <a href={`${v.discord}`} target="_blank" rel="noreferrer">
                         <SiDiscord color="rgb(255 255 255)" size={20} />
                       </a>
                     ) : null}
@@ -270,7 +285,12 @@ function Collection() {
                         <div
                           key={i}
                           className="w-full mb-1 cursor-pointer hover:bg-gray-500/20 "
-                          onClick={() => window.open(v.permalink, "_blank")}
+                          onClick={() =>
+                            window.open(
+                              `https://opensea.io/assets/ethereum/${v.contract}/${v.tokenid}`,
+                              "_blank",
+                            )
+                          }
                         >
                           <div className="flex items-center justify-between rounded bg-gray-500/10 h-16 p-2">
                             <div className="flex justify-center">
@@ -594,7 +614,6 @@ function Collection() {
               </div>
             </div>
             <Lines filter={filter} collection={name} outlier={isOutlier} />
-            {/* <Bars filter={filter} collection={name} /> */}
           </div>
         </div>
         <div className="flex flex-row mt-2">
@@ -603,16 +622,13 @@ function Collection() {
               <Bars collection={name} />
             </div>
           </div>
-          {/* <div className="basis-[48.5%] border border-gray-500 rounded-xl m-2 p-2">
-            <div className="">
-              <Bars collection={name} />
-            </div>
-          </div> */}
         </div>
       </div>
       <MetaTag
         name={
-          collections.data?.length > 0 ? collections.data[0].name_adr : name
+          collections.isSuccess === true
+            ? collections.data[0].collection_name
+            : name
         }
       />
       {/* <MetaTag name={name} /> */}

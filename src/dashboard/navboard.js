@@ -21,7 +21,7 @@ export default function Navbar() {
     let matches = [];
     if (text.length > 0) {
       matches = collection.data?.filter((name) =>
-        name.name_adr.toLowerCase().startsWith(text.toLowerCase()),
+        name.collection_name.toLowerCase().startsWith(text.toLowerCase()),
       );
     }
     setSuggestion(matches);
@@ -87,18 +87,12 @@ export default function Navbar() {
                           key={i}
                           className="hover:bg-gray-500 hover:bg-opacity-10  flex  items-center cursor-pointer p-[8px] w-64"
                           onClick={() => {
-                            navigate(
-                              `/collection/${
-                                sugges.slug_os.split("/")[
-                                  sugges.slug_os.split("/").length - 1
-                                ]
-                              }`,
-                            );
+                            navigate(`/collection/${sugges.collection_adr}`);
                           }}
                         >
                           <img
-                            alt={`${sugges.name_adr}`}
-                            src={sugges.image_link}
+                            alt={`${sugges.collection_name}`}
+                            src={sugges.profile}
                             style={{
                               width: 30,
                               height: 30,
@@ -107,14 +101,14 @@ export default function Navbar() {
                           />
                           <div className="px-[8px] ">
                             <h6 className="font-normal text-sm">
-                              {sugges.name_adr}
+                              {sugges.collection_name}
                             </h6>
                             <span className="text-gray-600 text-xs font-medium">
-                              {sugges.contract_adr.slice(0, 6 - 1) +
+                              {sugges.collection_adr.slice(0, 6 - 1) +
                                 "..." +
-                                sugges.contract_adr.slice(
-                                  sugges.contract_adr.length - 6,
-                                  sugges.contract_adr.length,
+                                sugges.collection_adr.slice(
+                                  sugges.collection_adr.length - 6,
+                                  sugges.collection_adr.length,
                                 )}
                             </span>
                           </div>
