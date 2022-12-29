@@ -65,7 +65,7 @@ export default function Navbar() {
       <a href="/dashboard" className="ml-5">
         <div className="text-white text-3xl grid grid-flow-col items-center ">
           <img src={logo} alt="logo" className="h-14 p-2 rounded-sm" />
-          <p className="font-Anton px-1 font-medium neontext">Kaigan</p>
+          {/* <p className="font-Anton px-1 font-medium neontext">Kaigan</p> */}
         </div>
       </a>
       <div className="text-white flex flex-grow px-14">

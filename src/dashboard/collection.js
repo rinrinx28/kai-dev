@@ -11,6 +11,7 @@ import {
   getListed,
   getSold,
   updateCollection,
+  getItems,
 } from "../api/serverapi";
 import { RiFileCopyLine } from "react-icons/ri";
 import ReactTooltip from "react-tooltip";
@@ -23,6 +24,7 @@ import { useQuery } from "react-query";
 import { ethers } from "ethers";
 import { Cross as Hamburger } from "hamburger-react";
 import { Lines, Bars } from "../chart/linechart";
+import ImgToken from "../components/imgtoken";
 
 function Collection() {
   const [copy, setCopy] = useState("Copy");
@@ -63,7 +65,7 @@ function Collection() {
   const listing = useQuery(
     "get-listed",
     () => {
-      return getListed(name);
+      return getListed(name.toLocaleLowerCase());
     },
     { refetchInterval: 5000 },
   );
@@ -74,6 +76,9 @@ function Collection() {
     },
     { refetchInterval: 5000 },
   );
+  if (listing.isSuccess) {
+    // console.log(listing.data);
+  }
   var option_select = [
     { value: "1D", label: "1D" },
     { value: "3D", label: "3D" },
@@ -259,7 +264,7 @@ function Collection() {
         </div>
         <div className="flex flex-row mt-2">
           <div className="basis-1/4 flex-grow-0 p-2 border border-gray-500 rounded-xl m-2">
-            {listing.data !== undefined ? (
+            {listing.isSuccess === true ? (
               <div className="flex-col">
                 <div className="flex flex-row flex-wrap justify-between">
                   <div className="h-12 m-2">
@@ -294,20 +299,17 @@ function Collection() {
                         >
                           <div className="flex items-center justify-between rounded bg-gray-500/10 h-16 p-2">
                             <div className="flex justify-center">
-                              <img
-                                className="object-contain rounded block"
-                                style={{
-                                  height: "48px",
-                                  aspectRatio: "auto 48 / 48",
-                                  width: "48px",
-                                }}
-                                src={`${v.image_url}`}
-                                alt={v.token_name}
+                              <ImgToken
+                                contract={v.contract}
+                                tokenid={v.tokenid}
                               />
                               <div className="ml-2 flex items-center">
                                 <div className="flex items-center">
                                   <p className="font-normal text-sm text-white">
-                                    {v.token_name}
+                                    Token:{" "}
+                                    <span className="text-base text-gray-300 font-bold">
+                                      {v.tokenid}
+                                    </span>
                                   </p>
                                 </div>
                               </div>
@@ -324,9 +326,7 @@ function Collection() {
                                     alt="eth"
                                   />
                                   <p className="font-medium text-sm text-white">
-                                    {ethers.utils.formatEther(
-                                      `${v.base_price}`,
-                                    )}
+                                    {ethers.utils.formatEther(`${v.price}`)}
                                   </p>
                                   <img
                                     src={opensea_dark}
@@ -339,7 +339,7 @@ function Collection() {
                                 </div>
                               </div>
                               <div className="flex items-center mt-1 text-xs text-gray-500">
-                                {moment.unix(v.startTime).fromNow()}
+                                {moment.unix(v.listing_time).fromNow()}
                               </div>
                             </div>
                           </div>
@@ -401,8 +401,8 @@ function Collection() {
               </div>
             )}
           </div>
-          <div className="basis-1/4 flex-grow-0 p-2 border border-gray-500 rounded-xl m-2">
-            {sold.data !== undefined ? (
+          {/* <div className="basis-1/4 flex-grow-0 p-2 border border-gray-500 rounded-xl m-2">
+            {sold.isSuccess === true ? (
               <div className="flex-col">
                 <div className="flex flex-row flex-wrap justify-between">
                   <div className="h-12 m-2">
@@ -540,8 +540,8 @@ function Collection() {
                 </div>
               </div>
             )}
-          </div>
-          <div className="basis-1/2 border border-gray-500 rounded-xl m-2 p-2">
+          </div> */}
+          {/* <div className="basis-1/2 border border-gray-500 rounded-xl m-2 p-2">
             <div className="m-5">
               <span className="uppercase flex items-center">
                 Trades
@@ -614,15 +614,15 @@ function Collection() {
               </div>
             </div>
             <Lines filter={filter} collection={name} outlier={isOutlier} />
-          </div>
+          </div> */}
         </div>
-        <div className="flex flex-row mt-2">
+        {/* <div className="flex flex-row mt-2">
           <div className="basis-[49.9%] border border-gray-500 rounded-xl m-2 p-2">
             <div className="">
               <Bars collection={name} />
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
       <MetaTag
         name={
