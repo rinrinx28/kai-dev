@@ -56,6 +56,7 @@ export function updateCollection(
   twitter_username,
   slug,
   collection_name,
+  metadata,
 ) {
   let post = {
     name: "update_collection",
@@ -67,6 +68,7 @@ export function updateCollection(
     twitter_username: twitter_username,
     slug: slug,
     collection_name: collection_name,
+    metadata: metadata,
   };
   return fetch("https://kaigan.io/api/v1", {
     method: "POST",
@@ -100,12 +102,17 @@ export function getSold(slug) {
 }
 
 export function getItems(contract, tokenid) {
-  return fetch(
-    `https://eth-mainnet.g.alchemy.com/nft/v2/VMWh2j_ip3vmb6j_axc76huyJImgU0fI/getNFTMetadata?contractAddress=${contract}&tokenId=${tokenid}&refreshCache=false`,
-    {
-      headers: {
-        accept: "application/json",
-      },
+  var infura = `https://nft.api.infura.io/networks/1/nfts/${contract}/tokens/${tokenid}`;
+  return fetch(infura, {
+    headers: {
+      accept: "application/json",
+      // "X-API-KEY": "406cb77152e84d318ec2075bb9d2f825",
+      Authorization:
+        "Basic YzZkMjY4NWM3MjNiNDExNzhlMGQxNmI5MzU5MWNhNWU6NGFmOTQzMTNhNDNhNGIxZWFlMzJjNDRhOTllYWViMGQ=",
     },
-  ).then((res) => res.json());
+  }).then((res) => res.json());
+}
+
+export function getTokenUri(metadata, tokenid) {
+  return fetch(`${metadata}/${tokenid}.json`).then((res) => res.text());
 }
