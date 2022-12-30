@@ -1,39 +1,30 @@
 import { getItems } from "../api/serverapi";
-import { useQuery } from "react-query";
-// import fetch from "node-fetch";
-// import { useState } from "react";
+import { useState, useEffect } from "react";
+import WebSocket from "ws";
 
-function ImgToken({ contract, tokenid }) {
-  const img = useQuery("img-query", () => {
-    return getItems(contract, tokenid);
-  });
-  // const [isImg, setImge] = useState();
-  // fetch()
+const webSocket = new WebSocket("ws://localhost:3001/nfts/");
+
+function ImgToken({ metadata, tokenid, contract }) {
+  const [isImg, setImg] = useState(tokenid);
+  useEffect(() => {
+    getItems(contract, tokenid).then((res) => {
+      // console.log(res);
+      // console.log(res);
+      setImg(res.metadata.image);
+    });
+  }, []);
   return (
     <>
-      {img.isSuccess === true ? (
-        <img
-          className="object-contain rounded block"
-          style={{
-            height: "48px",
-            aspectRatio: "auto 48 / 48",
-            width: "48px",
-          }}
-          src={`${img.data.metadata.image}`}
-          alt={tokenid}
-        />
-      ) : (
-        <img
-          className="object-contain rounded block"
-          style={{
-            height: "48px",
-            aspectRatio: "auto 48 / 48",
-            width: "48px",
-          }}
-          src={`${tokenid}`}
-          alt={tokenid}
-        />
-      )}
+      <img
+        className="object-contain rounded block"
+        style={{
+          height: "48px",
+          aspectRatio: "auto 48 / 48",
+          width: "48px",
+        }}
+        src={`${isImg}`}
+        alt={tokenid}
+      />
     </>
   );
 }

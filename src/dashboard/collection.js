@@ -48,16 +48,22 @@ function Collection() {
         var twitter_username = collection.twitter_username;
         var slug = collection.slug;
         var collection_name = collection.name;
-        updateCollection(
-          name,
-          featured_image_url,
-          banner_image_url,
-          external_url,
-          discord_url,
-          twitter_username,
-          slug,
-          collection_name,
-        );
+        getItems(name.toLocaleLowerCase(), 1).then((items) => {
+          var tokenuri = items.tokenUri.gateway;
+          var arrayString = tokenuri.split("/");
+          var metadata = arrayString.slice(0, arrayString.length - 1).join("/");
+          updateCollection(
+            name,
+            featured_image_url,
+            banner_image_url,
+            external_url,
+            discord_url,
+            twitter_username,
+            slug,
+            collection_name,
+            metadata,
+          );
+        });
         window.location.reload();
       });
     }
@@ -67,14 +73,14 @@ function Collection() {
     () => {
       return getListed(name.toLocaleLowerCase());
     },
-    { refetchInterval: 5000 },
+    { refetchInterval: 10000 },
   );
   const sold = useQuery(
     "get-sold",
     () => {
       return getSold(name);
     },
-    { refetchInterval: 5000 },
+    { refetchInterval: 10000 },
   );
   if (listing.isSuccess) {
     // console.log(listing.data);
@@ -300,8 +306,9 @@ function Collection() {
                           <div className="flex items-center justify-between rounded bg-gray-500/10 h-16 p-2">
                             <div className="flex justify-center">
                               <ImgToken
-                                contract={v.contract}
+                                metadata={collections.data[0].metadata}
                                 tokenid={v.tokenid}
+                                contract={name}
                               />
                               <div className="ml-2 flex items-center">
                                 <div className="flex items-center">
