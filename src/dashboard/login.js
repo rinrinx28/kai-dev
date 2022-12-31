@@ -1,5 +1,5 @@
 import "./dashboard.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import metamask from "../image/metamask.png";
 import { ToastContainer, toast } from "react-toast";
 import { PulseLoader } from "react-spinners";
@@ -7,8 +7,16 @@ import { ethers } from "ethers";
 import MetaTag from "../components/metaTags";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../api/serverapi";
+import { w3cwebsocket as W3CWebSocket } from "websocket";
+
+const client = new W3CWebSocket("ws://127.0.0.1:8000");
 
 export default function Login() {
+  useEffect(() => {
+    client.onopen = () => {
+      console.log("WebSocket Client Connected");
+    };
+  }, []);
   //! ——————————————————[UseState]——————————————————
   const [isconnect, setIsconnect] = useState(false);
   const [isload, setIsload] = useState(false);

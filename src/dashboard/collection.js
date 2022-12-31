@@ -25,6 +25,7 @@ import { ethers } from "ethers";
 import { Cross as Hamburger } from "hamburger-react";
 import { Lines, Bars } from "../chart/linechart";
 import ImgToken from "../components/imgtoken";
+import { ToastContainer, toast } from "react-toast";
 
 function Collection() {
   const [copy, setCopy] = useState("Copy");
@@ -32,6 +33,9 @@ function Collection() {
   const [isOpen, setOpen] = useState(false);
   const [isOutlier, setOutlier] = useState(false);
   const { name } = useParams();
+  const handleMetaToast = () => {
+    toast.warn("Collection Not Update, please wait for a minute");
+  };
 
   //! ——————————————————[Start useQuery]——————————————————
   const collections = useQuery("get-collectionstt", () => {
@@ -39,6 +43,7 @@ function Collection() {
   });
   if (collections.isSuccess === true) {
     if (collections.data[0].update_stt === 0) {
+      handleMetaToast();
       getCollectionnew(name).then((data) => {
         var collection = data.collection;
         var featured_image_url = collection.image_url;
@@ -64,7 +69,7 @@ function Collection() {
             metadata,
           );
         });
-        window.location.reload();
+        setTimeout(() => window.location.reload(), 5 * 1e3);
       });
     }
   }
@@ -638,7 +643,7 @@ function Collection() {
             : name
         }
       />
-      {/* <MetaTag name={name} /> */}
+      <ToastContainer delay={1e3 * 30} position="bottom-right" />
     </div>
   );
 }

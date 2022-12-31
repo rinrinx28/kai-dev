@@ -1,8 +1,5 @@
 import { getItems } from "../api/serverapi";
 import { useState, useEffect } from "react";
-import WebSocket from "ws";
-
-const webSocket = new WebSocket("ws://localhost:3001/nfts/");
 
 function ImgToken({ metadata, tokenid, contract }) {
   const [isImg, setImg] = useState(tokenid);
